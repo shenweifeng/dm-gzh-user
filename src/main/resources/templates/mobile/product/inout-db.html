@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head th:replace="common/header :: common_header_mobile">
+    <meta charset="UTF-8"/>
+    <base target="_parent"/>
+
+</head>
+
+<body>
+<div class="easyui-navpanel">
+
+    <header class="css-background-main">
+        <div class="m-toolbar">
+            <div class="m-left">
+                <a th:href="@{/admin/index}" class="easyui-linkbutton" data-options="iconCls:'icon-back-black',plain:true"></a>
+            </div>
+            <div class="m-title" >产品调拨</div>
+         </div>
+    </header>
+
+    <form id="ff" style="padding: 10px;">
+
+        <div style="margin-bottom:10px">
+            <input id="storeId" class="easyui-textbox" label="所属仓库:" prompt="" style="width:60%">
+        </div>
+
+        <div style="margin-bottom:10px">
+            <input id="pid" class="easyui-textbox " data-options="editable: false" label="产品类别:" prompt="选择类别" style="width:60%">
+            <input type="hidden" id="pid-value" value="0"/>
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <input id="name" class="easyui-textbox" data-options="editable: false" label="产品名称:" prompt="选择产品" style="width:60%">
+            <input type="hidden" id="name-value" value="0"/>
+        </div>
+
+        <div style="margin-bottom:10px">
+            <input id="model" class="easyui-textbox" label="产品型号:" prompt="" style="width:60%">
+            <input type="hidden" id="model-value" value=""/>
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <input id="remain" class="easyui-textbox" label="当前库存:" prompt="当前库存" style="width:60%">
+        </div>
+
+        <div style="margin-bottom:10px">
+            <input id="storeIdOut" class="easyui-textbox" label="目标仓库:" prompt="调拨目标仓库" style="width:60%">
+        </div>
+
+<!--        <div style="margin-bottom:10px;">
+            <input id="remainOut" class="easyui-textbox" label="目标仓库存:" prompt="目标仓库存" style="width:60%">
+        </div>-->
+
+        <div style="margin-bottom:10px;">
+            <input id="amount" class="easyui-numberbox" label="调拨数量:" prompt="数量" style="width:60%">
+            <a id="mobile-product-inout-btn-save" class="btn_menu_common" style="width: 80px;">保存</a>
+        </div>
+
+    </form>
+
+</div>
+
+<script th:inline="javascript">
+    //<![CDATA[
+    $(function() {
+        // js 代码逻辑
+
+        var v_store_id = 0; // 仓库ID
+        var v_category_id = 0; // 类别ID
+        var v_name_id = 0; // 产品ID
+        var v_model_id = ""; // 产品型号
+        var v_amount = 0; // 产品库存
+
+        // 查询产品库存
+        getCountProductModel = function(){
+            $('#remain').numberbox('setValue', 0); // 产品库存
+            v_amount = 0;
+            // console.log("v_name_id="+v_name_id);
+            if(v_name_id>0){
+                $.post( '/product/ware/remain.do',
+                    {
+                        'productId': v_name_id,
+                        'storeId': v_store_id,
+                        'model': v_model_id
+                    },
+                    function(data){
+                    // console.log(data);
+                    // console.log(data.data);
+                        if(data.code=='200'){
+                            $('#remain').numberbox('setValue', data.data);
+                            v_amount = data.data;
+                        }
+                    }, 'json' );
+            }
+        };
+
+        // 仓库
+        $('#storeId').combobox({
+            url: '/store/tree.do', multiple: false, editable: false, valueField:'id', textField:'text',
+            onSelect: function (node) {
+                v_store_id = node.id;
+
+                // 清空级联数据
+                $('#remain').numberbox('setValue', 0); // 产品库存
+                v_amount = 0;
+            }
+        });
+
+        // 调拨到仓库
+        $('#storeIdOut').combobox({
+            url: '/store/tree.do', multiple: false, editable: false, valueField:'id', textField:'text'
+        });
+
+        // 产品类别
+        $('#pid').combotree({
+            url: "/product/category/tree.do", multiple: false, lines: true, checkbox: true,
+            onSelect: function (node) {
+                $("#pid-value").val(node.id);
+                v_category_id = node.id;
+
+                // 清空级联数据
+                $("#name").combobox("clear");  //产品名称
+                $("#name-value").val(0);
+                v_name_id = 0;
+
+                $("#model").combobox("clear"); //产品型号
+                $("#model-value").val(0);
+                v_model_id = "";
+
+                $('#remain').numberbox('setValue', 0); // 产品库存
+                v_amount = 0;
+
+                // if($(this).combobox("getValue")!=''){
+                    // 产品名称
+                    $("#name").combobox("reload", "/product/tree/name.do?categoryId=" + node.id);
+                // }
+            }
+
+        });
+
+        // 产品名称
+        $('#name').combobox({
+            //url: '/product/tree/name.do?productId='+1,
+            multiple: false, editable: false, valueField:'id', textField:'text',
+            onSelect: function (node) {
+                $("#name-value").val(node.id);
+                v_name_id = node.id;
+
+                // 清空级联数据
+                $("#model").combobox("clear"); //产品型号
+                $("#model-value").val("");
+                v_model_id = "";
+
+                $('#remain').numberbox('setValue', 0); // 产品库存
+                v_amount = 0;
+
+                // console.log("productId="+node.id);
+
+                // if($(this).combobox("getValue")!=''){
+                    // 产品名称
+                    $("#model").combobox("reload", "/product/tree/model.do?productId=" + node.id);
+                // }
+            }
+        });
+
+        // 产品型号
+        $('#model').combobox({
+            //url: '/product/tree/model.do?productId='+1,
+            multiple: false, editable: true, valueField:'id', textField:'text',
+            onSelect: function (node) {
+                $("#model-value").val(node.id);
+                v_model_id = node.id;
+
+                // 清空级联数据
+                $('#remain').numberbox('setValue', 0); // 产品库存
+                v_amount = 0;
+
+                // console.log("v_model_id="+node.id);
+
+                // 检索库存
+                getCountProductModel();
+            },
+            onChange: function(newData, oldData){
+                // console.log(newData, oldData, $(this).combobox("getValue"));
+                // 检索库存
+                v_model_id = newData;
+                getCountProductModel();
+            }
+        });
+
+        $('#amount').numberbox({ min:0, precision:0, required:true });
+        $('#remain').numberbox({ min:0, precision:0, required:false, editable: false });
+
+        $('#mobile-product-inout-btn-save').linkbutton({
+            iconCls: 'icon-save'
+        });
+
+        $('#mobile-product-inout-btn-save').on('click', function() {
+
+            var storeId = $('#storeId').combobox('getValue');
+            if(storeId == ""){
+                tipsinfo("请选择仓库！");
+                return false;
+            }
+            var pid = $('#pid').combobox('getValue');
+            if(pid == ""){
+                tipsinfo("请选择产品类别！");
+                return false;
+            }
+            var productId = $('#name').combobox('getValue');
+            if(productId == ""){
+                tipsinfo("请选择产品！");
+                return false;
+            }
+            var model = $('#model').combobox('getValue');
+            if(model == ""){
+                tipsinfo("请选择产品型号！");
+                return false;
+            }
+
+            var amount = $('#amount').numberbox('getValue');
+            if(amount == ""){
+                tipsinfo("请输入数量！");
+                return false;
+            }
+
+            var storeIdOut = $('#storeIdOut').combobox('getValue');
+            if(storeIdOut == ""){
+                tipsinfo("请选择调拨的目标仓库！");
+                return false;
+            }
+
+            if(storeId == storeIdOut){
+                tipsinfo("不能自己给自己调拨！");
+                return false;
+            }
+
+            $.messager.confirm("系统提示","确定要保存？",function(r){
+                if(r){
+                    $.post(
+                        '/product/inout/db.do',
+                        {
+                            'productId': productId,
+                            'type': 2,
+                            'storeId': storeId,
+                            'storeIdOut': storeIdOut,
+                            'model': model,
+                            'amount': amount
+                        },
+                        function(data){
+                            if(data.code=='200'){
+                                tipsinfo("操作成功！");
+                            }else if(data.message){
+                                tipsinfo("操作失败："+data.message);
+                            }else{
+                                tipsinfo("网络不给力，请稍后再试！");
+                            }
+                        },
+                        'json' );
+                }
+            });
+        }); // end of save
+
+    });
+    //]]>
+</script>
+
+</body>
+
+</html>

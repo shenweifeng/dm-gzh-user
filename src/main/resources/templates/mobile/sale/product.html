@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head >
+    <meta charset="UTF-8"/>
+    <base target="_parent"/>
+
+    <style>
+        .span_block{
+            display: block;
+            padding-left: 5px;
+            padding-top: 5px;
+        }
+        .span_block_hiden{
+            overflow-x: scroll; /*添加横向滚动条*/
+            white-space: nowrap;/*不换行*/
+            padding-left: 5px;
+            padding-top: 5px;
+        }
+        .span-model{
+            margin-left: 5px;
+            background-color: #00B0F0;
+            color: white;
+            padding: 0 5px;
+        }
+        .span-model-selected{
+            background-color: red;
+            margin-left: 5px;
+            color: white;
+            padding: 0 5px;
+        }
+    </style>
+
+</head>
+
+<body>
+<div id="index-main-body">
+
+    <div th:if="${#arrays.isEmpty(list)}">没有数据</div>
+
+    <div id="div-list" th:if="${ not #arrays.isEmpty(list)}">
+        <ul class="m-list" th:each="obj : ${list}">
+            <li>
+                <div style="float: left; width: 30%;">
+                    <img th:src="${obj.img1Url}" width="100px" height="100px"/>
+                </div>
+                <div style="float: left; width: 70%;">
+                    <span th:text="${'名称：'+obj.name}" class="span_block"></span>
+                    <span th:text="${'描述：'+obj.desc}" class="span_block span_block_hiden"></span>
+                    <div th:if="${  not #arrays.isEmpty(obj.modelList) }" class="span_block_hiden" >
+                        <!--<span th:text="${'型号：'}" ></span>-->
+                        <span th:each="md : ${obj.modelList}">
+                            <span th:text="${md.model}" th:attr="data-ware=${md.ware }" class="span-model event-model"></span>
+                        </span>
+                    </div>
+                    <span id="span-ware" th:text="${ '库存：'+obj.ware}" class="span_block"></span>
+                    <input type="hidden" id="span-ware-value" th:value="${obj.ware}" />
+                </div>
+            </li>
+        </ul>
+
+    </div>
+
+</div>
+
+<script th:inline="javascript">
+    //<![CDATA[
+        $(function() {
+            // js 代码逻辑
+
+            $(".event-model").on('click', function(){
+                //$(".event-model").removeClass("span-model");
+                $(".span-model-selected").removeClass("span-model-selected");
+                $(this).addClass("span-model-selected");
+                $("#span-ware").html('库存：'+$(this).data("ware"));
+                $("#span-ware-value").val($(this).data("ware"));
+            });
+
+        });
+    //]]>
+</script>
+
+</body>
+
+</html>

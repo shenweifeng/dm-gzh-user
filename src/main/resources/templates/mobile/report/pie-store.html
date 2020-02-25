@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head th:replace="common/header :: common_header_mobile">
+    <meta charset="UTF-8"/>
+    <base target="_parent"/>
+
+    <style>
+
+        .pie_style{
+            padding-top: 5px;
+            float: left;
+        }
+
+    </style>
+
+</head>
+
+<body>
+<div class="easyui-navpanel">
+
+    <header class="css-background-main">
+        <div class="m-toolbar">
+            <div class="m-left">
+                <a th:href="@{/admin/index}" class="easyui-linkbutton" data-options="iconCls:'icon-back-black',plain:true"></a>
+            </div>
+            <div class="m-title">报表-产品信息</div>
+        </div>
+    </header>
+
+    <div id="pie1" class="pie_style">
+    </div>
+    <div id="pie2" class="pie_style">
+    </div>
+
+</div>
+
+<script th:inline="javascript">
+    //<![CDATA[
+    $(function() {
+        // js 代码逻辑
+
+        // HighCharts汉化
+        Highcharts.setOptions({
+            lang: {
+                printChart:"打印图表",
+                downloadJPEG: "下载JPEG图片" ,
+                downloadPDF: "下载PDF文档"  ,
+                downloadPNG: "下载PNG图片"  ,
+                downloadSVG: "下载SVG矢量图" ,
+                downloadCSV: "下载CSV文件" ,
+                downloadXLS: "下载XLS文件" ,
+                exportButtonTitle: "导出图片"
+            }
+        });
+
+        var pie1_shops;
+        var bar1;
+
+        var storeId = 0;
+        var productId = 0;
+
+        //$(".pie_style").css("height", $(window).height()-100);
+
+        sum_shops_chain = function() {
+            // console.log("sum_shops_chain...");
+            $.post("/common/report/pie/store.do", {
+            }, function(data) {
+                // console.log(data);
+                if (data.total>0) {
+
+                    var chartPieDatas1 = new Object();
+                    chartPieDatas1.div = "pie1";
+                    chartPieDatas1.title = data.ptitle;
+                    chartPieDatas1.name = "pie-shops-chain";
+                    chartPieDatas1.datas = data.datas;
+                    chartPieDatas1.unit = "个";
+
+                    pie1_shops = createChartPie(chartPieDatas1);
+                    pie1_shops.update({
+                        plotOptions: { pie: { events: { click: function(e){pie1_shops_click(e);} } } }
+                    });
+
+                }else {
+                    $("#pie1").html('<div style="color: red; padding: 10px;">没有数据! </div>');
+                }
+            }, 'json');
+
+        }; // end of sum_shops_chain
+
+        sum_shops_chain();
+
+        pie1_shops_click = function(e){
+
+            $('#pie2').html('');
+            $('#pie2').hide();
+
+            sum_shops_chain_province(e.point);
+        }
+
+        sum_shops_chain_province = function(point) {
+
+            // console.log("sum_shops_chain_province...");
+
+            storeId = point.sumId;
+            productId = 0;
+
+            var shops_pie2_shops_title = point.name;
+
+            $('#pie2').show();
+
+            $.post("/common/report/pie/store/product.do", {
+                "storeId": storeId
+            }, function(data) {
+                // console.log(data);
+
+                if (data.total>0) {
+
+                    /**
+                     * 柱状图
+                     * chartBarDatas.div
+                     * chartBarDatas.title
+                     * chartBarDatas.xdatas
+                     * chartBarDatas.ynames
+                     * chartBarDatas.ydatas
+                     */
+
+                    var chartBarDatas = new Object();
+                    chartBarDatas.div = "pie2";
+                    chartBarDatas.title = data.ptitle;
+                    chartBarDatas.name = "bar1_sum_cash";
+                    chartBarDatas.xdatas = data.xnames;
+                    chartBarDatas.ynames = data.ynames;
+                    chartBarDatas.ydatas = data.ydatas;
+                    chartBarDatas.unit = "次";
+
+                    bar1 = createChartBar(chartBarDatas);
+
+                }else {
+                    $("#pie2").html(point.name + '<div style="color: red; padding: 10px;">没有数据! </div>');
+                }
+            }, 'json');
+
+        }; // end of sum_shops_chain
+
+    });
+    //]]>
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head th:replace="common/header :: common_header_mobile">
+    <meta charset="UTF-8"/>
+    <base target="_parent"/>
+
+    <style>
+
+        body {
+            font-family: '微软雅黑';
+            font-size: 14px;
+        }
+
+    </style>
+
+</head>
+<body>
+<div class="easyui-navpanel">
+
+    <header class="css-background-main">
+        <div class="m-toolbar">
+            <div class="m-left">
+                <a th:href="@{/admin/index}" class="easyui-linkbutton" data-options="iconCls:'icon-back-black',plain:true"></a>
+            </div>
+            <div class="m-title">仓库管理</div>
+        </div>
+    </header>
+
+    <div id="index-my-body">
+        <ul class="m-list">
+            <li class="m-list-group">账户信息</li>
+            <li><a th:href="@{/user/modifypass.html}">密码修改</a></li>
+        </ul>
+    </div>
+
+</div>
+
+<body>
+
+<script th:inline="javascript">
+    //<![CDATA[
+    $(function() {
+        // js 代码逻辑
+
+    });
+    //]]>
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head >
+    <meta charset="UTF-8"/>
+    <base target="_parent"/>
+
+    <style>
+
+        body {
+            font-family: '微软雅黑';
+            font-size: 14px;
+        }
+
+        .btn_menu{
+            width: 30%;
+            padding-left: 1%;
+            height: 40px;
+            padding-top: 5px;
+            margin-left: 2%;
+            color: white;
+            background: #36A9CE;
+            font-size: large;
+        }
+        .btn_menu_p{
+            padding-top: 20px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+<div id="index-main-body">
+
+    <p>基础数据</p>
+    <a th:href="@{/admin/store/list.html}" id="btn-store" >仓库管理</a>
+    <a th:href="@{/product/category/list.html}" id="btn-product-type"  >产品类别</a>
+    <a th:href="@{/admin/user/list.html}" id="btn-user" >人员管理</a>
+
+    <p>产品管理</p>
+    <a th:href="@{/product/list.html}" id="btn-product" >产品管理</a>
+    <a th:href="@{/product/inout/in.html}" id="btn-product-in" >产品入库</a>
+    <a th:href="@{/product/inout/db.html}" id="btn-product-out" >产品调拨</a>
+
+    <p>订单管理</p>
+    <a id="btn-order" class="menu-item-disabled" >订单管理</a>
+    <a id="btn-report"  class="menu-item-disabled" >统计报表</a>
+    <a id="btn-product-sell"  class="menu-item-disabled" >产品售卖</a>
+
+    <p>个人中心</p>
+    <a th:href="@{/user/modifypass.html}" id="btn-userinfo" >账户信息</a>
+
+</div>
+
+<script th:inline="javascript">
+    //<![CDATA[
+        $(function() {
+            // js 代码逻辑
+            $('#btn-store').linkbutton({
+                iconCls: 'icon-search'
+            });
+            $('#btn-product-type').linkbutton({
+                iconCls: 'icon-search'
+            });
+            $('#btn-user').linkbutton({
+                iconCls: 'icon-search'
+            });
+            // 产品管理
+            $('#btn-product').linkbutton({
+                iconCls: 'icon-search'
+            });
+            $('#btn-product-in').linkbutton({
+                iconCls: 'icon-search'
+            });
+            $('#btn-product-out').linkbutton({
+                iconCls: 'icon-search'
+            });
+
+            // 订单管理
+            $('#btn-order').linkbutton({
+                iconCls: 'icon-search'
+            });
+            $('#btn-report').linkbutton({
+                iconCls: 'icon-search'
+            });
+            $('#btn-product-sell').linkbutton({
+                iconCls: 'icon-search'
+            });
+
+            // 个人中心
+            $('#btn-userinfo').linkbutton({
+                iconCls: 'icon-search'
+            });
+
+            $("#index-main-body").find("a").addClass("btn_menu");
+            $("#index-main-body").find("p").addClass("btn_menu_p");
+        });
+    //]]>
+</script>
+
+</body>
+
+</html>

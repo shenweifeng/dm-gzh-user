@@ -1,0 +1,17 @@
+body {
+    font-family: '微软雅黑';
+    font-size: 14px;
+}
+.css-background-main-white{
+    background-color: #36A9CE;
+    color: white;
+}
+
+.btn_menu_common{
+    /*height: 40px;
+    padding-top: 5px;*/
+    margin-left: 2%;
+    color: white;
+    background: #36A9CE;
+    font-size: large;
+}

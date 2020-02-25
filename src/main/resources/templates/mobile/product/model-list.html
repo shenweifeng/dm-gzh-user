@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head >
+    <meta charset="UTF-8"/>
+    <base target="_parent"/>
+
+</head>
+
+<body>
+
+<div style="padding-top: 10px">
+    <table id="mobile_product_model_list_grid_table_01"></table>
+</div>
+
+<script th:inline="javascript">
+    //<![CDATA[
+    $(function() {
+        // js 代码逻辑
+
+        var productId = [[${productId}]];
+
+        // 自由列
+        var columnsOut = [];
+        var columnsIn = [];
+
+        columnsIn.push({ field : 'id', title : "ID", hidden: true, width: 60, align : 'center' });
+        columnsIn.push({ field : 'storeName', title : "仓库", width : 60, align : 'center' });
+        columnsIn.push({ field : 'model', title : "型号", width : 60, align : 'center' });
+        columnsIn.push({ field : 'amount', title : "库存", width : 60, align : 'center' });
+
+        columnsOut[0] = columnsIn;
+
+        $('#mobile_product_model_list_grid_table_01').datagrid({
+            //width: 800,
+            //height: ($(window).height()*0.8),
+            title : '产品型号',
+            //iconCls : 'icon-edit',
+            striped : true, //隔行变色
+            pagination : false, //分页控件
+            rownumbers : true, //显示行号
+            pageSize: 20, //每页显示条数
+            //collapsible : true, //是否可 折叠
+            //maximizable : true, // 最大化
+            singleSelect : true, //是否单选
+            idField : 'id', //主键行,不设置则无法取得选中的所有行
+            fitColumns : true, //自适应宽度
+            nowrap : false, //是否自动换行显示：true-不自动换行，false-自动换行
+
+            checkOnSelect : true,
+            selectOnCheck : true,
+            url : "/product/model/list.do?productId="+productId+"&_t=" + Math.random(),
+            columns : columnsOut,
+            onLoadSuccess : function(data) {
+                // 重新加载数据，清空
+            }
+        });
+
+    });
+    //]]>
+</script>
+
+</body>
+
+</html>

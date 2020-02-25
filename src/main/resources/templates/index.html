@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head th:replace="common/header :: common_header_mobile">
+    <meta charset="UTF-8"/>
+    <base target="_parent"/>
+</head>
+
+<body>
+<div>
+</div>
+
+<script th:inline="javascript">
+    //<![CDATA[
+        $(function() {
+            // js 代码逻辑
+            window.location.replace("/sale/index.html");
+        });
+    //]]>
+</script>
+
+</body>
+
+</html>

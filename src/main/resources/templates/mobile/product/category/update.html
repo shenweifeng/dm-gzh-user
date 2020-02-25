@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head th:replace="common/header :: common_header_mobile">
+    <meta charset="UTF-8"/>
+    <base target="_parent"/>
+
+    <style>
+
+        body {
+            font-family: '微软雅黑';
+            font-size: 14px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+<div class="easyui-navpanel">
+
+    <header class="css-background-main">
+        <div class="m-toolbar">
+            <div class="m-left">
+                <a th:href="@{/product/category/list.html}" class="easyui-linkbutton" data-options="iconCls:'icon-back-black',plain:true"></a>
+            </div>
+            <div class="m-title">修改-产品类别</div>
+         </div>
+    </header>
+
+    <form id="ff" style="padding: 10px;">
+
+        <div style="margin-bottom:10px;">
+            <input id="name" th:value="${obj.name}" class="easyui-textbox" label="类别名称:" prompt="类别名称" style="width:100%">
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <input id="description" th:value="${obj.description}" class="easyui-textbox" label="类别描述:" prompt="类别描述" style="width:100%">
+        </div>
+
+        <div style="margin-bottom:10px">
+            <input id="pid" th:value="${obj.pidName}" th:disabled="true" class="easyui-textbox" label="上级类别:" prompt="" style="width:100%">
+            <input type="hidden" id="pid-value" th:value="${obj.pid}" />
+        </div>
+
+
+    </form>
+
+    <div style="margin: 0 auto; text-align: center;">
+        <a id="mobile-store-save-btn-save" class="btn_menu_common"
+           style="width: 90%;">保存</a>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    //<![CDATA[
+    $(function() {
+        // js 代码逻辑
+
+        var obj = [[${obj}]];
+
+        $('#name').textbox().next('span').find('input').focus();
+
+          $('#mobile-store-save-btn-save').linkbutton({
+            iconCls: 'icon-save'
+        });
+
+        $('#mobile-store-save-btn-save').on('click', function() {
+            $("#name").val($.trim($("#name").val()));
+            $("#description").val($.trim($("#description").val()));
+
+            if($("#name").val() == ""){
+                tipsinfo("请输入类别名称！");
+                return false;
+            }
+            if($("#description").val() == ""){
+                tipsinfo("请输入类别描述！");
+                return false;
+            }
+
+            $.messager.confirm("系统提示","确定要保存？",function(r){
+                if(r){
+                    $.post(
+                        '/product/category/update.do',
+                        {
+                            'id': obj.id,
+                            'name': $("#name").val(),
+                            'description': $("#description").val()
+                        },
+                        function(data){
+                            if(data.code=='200'){
+                                tipsinfo("操作成功！");
+                                window.location.replace('/product/category/list.html?_t=' + Math.random());
+                            }else if(data.message){
+                                tipsinfo("操作失败："+data.message);
+                            }else{
+                                tipsinfo("网络不给力，请稍后再试！");
+                            }
+                        },
+                        'json' );
+                }
+            });
+
+        });
+    });
+    //]]>
+</script>
+
+</body>
+
+</html>

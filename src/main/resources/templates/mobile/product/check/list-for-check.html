@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head th:replace="common/header :: common_header_mobile">
+    <meta charset="UTF-8"/>
+    <base target="_parent"/>
+
+    <style>
+
+        body {
+            font-family: '微软雅黑';
+            font-size: 14px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+<div class="easyui-navpanel">
+
+    <header class="css-background-main">
+        <div class="m-toolbar">
+            <div class="m-left">
+                <a th:href="@{/admin/index}" class="easyui-linkbutton" data-options="iconCls:'icon-back-black',plain:true"></a>
+            </div>
+            <div class="m-title" >产品盘点【<span style="color: red;" th:text="${today}"></span>】</div>
+        </div>
+    </header>
+
+    <div style="padding: 10px">
+        <input id="storeId" class="easyui-textbox" label="所属仓库:" prompt="" style="width: 100%">
+    </div>
+
+    <div style="padding-top: 0px">
+        <table id="mobile_product_list_grid_table_01"></table>
+    </div>
+
+</div>
+
+<script th:inline="javascript">
+    //<![CDATA[
+    $(function() {
+        // js 代码逻辑
+
+        var reload_table = function(storeId){
+            var op = $("#mobile_product_list_grid_table_01").datagrid("options");//获取 option设置对象
+            op.url = "/product/check/list/product.do?storeId="+storeId+"&_t=" + Math.random();//设置url
+            $("#mobile_product_list_grid_table_01").datagrid("load");//重新加载
+        }
+
+        // 仓库
+        $('#storeId').combobox({
+            url: '/store/tree/for/check.do',
+            // required: true,
+            multiple: false, editable: false,
+            valueField:'id',
+            textField:'text',
+            onSelect: function(data){
+                reload_table(data.id);
+            }
+        });
+
+        var toolbars = [];
+        toolbars.push('-');
+        toolbars.push({
+            text : '确认盘点',
+            iconCls : 'icon-ok',
+            handler : function() {
+                var rows = $('#mobile_product_list_grid_table_01').datagrid('getRows');
+                var selectSize = rows.length;
+                if (selectSize == 0) {
+                    tipsinfo("没有数据!");
+                    return false;
+                }
+                if(rows[0].checked == 1){
+                    tipsinfo("今天已盘点，勿重复操作!");
+                    return false;
+                }
+                var ret = "";
+                var amountReal = "";
+                for (var i=0;i<selectSize;i++) {
+                    $("#amountReal"+i).val( $.trim($("#amountReal"+i).val()) );
+                    if($("#amountReal"+i).val() == ""){
+                        tipsinfo("请核对【"+rows[i].productName+"("+rows[i].model+")】盘点数量！");
+                        return false;
+                    }
+                    amountReal = Number($("#amountReal"+i).val());
+                    ret += rows[i].id + ":" + amountReal + ",";
+                    // console.log("id="+rows[i].id+", amount="+rows[i].amount+", amountReal="+$("#amountReal"+i).val());
+                }
+                console.log(ret);
+
+                $.messager.confirm("系统提示","确定提交盘点信息？",function(r){
+                    if(r){
+                        $.post(
+                            '/product/check/save.do',
+                            {
+                                'ids': ret
+                            },
+                            function(data){
+                                if(data.code=='200'){
+                                    tipsinfo("操作成功！");
+                                }else if(data.message){
+                                    tipsinfo("操作失败："+data.message);
+                                }else{
+                                    tipsinfo("网络不给力，请稍后再试！");
+                                }
+                                reload_table( $('#storeId').combobox('getValue') );
+                            },
+                            'json' );
+                    }
+                });
+
+            }
+        });
+        toolbars.push('-');
+
+        // 冻结列
+        var frozenColumnsOut = [];
+        var frozenColumnsIn = [];
+        frozenColumnsIn.push({ field : 'ck', checkbox : true });
+        frozenColumnsOut[0] = frozenColumnsIn;
+
+        // 自由列
+        var columnsOut = [];
+        var columnsIn = [];
+
+        columnsIn.push({ field : 'id', title : "ID", hidden: true, width: 60, align : 'center' });
+        columnsIn.push({ field : 'productName', title : "名称", width : 60, align : 'center' });
+        columnsIn.push({ field : 'model', title : "型号", width : 60, align : 'center' });
+        columnsIn.push({ field : 'storeName', title : "仓库", width : 60, align : 'center' });
+        columnsIn.push({ field : 'amount', title : "库存", width : 60, align : 'center' });
+        columnsIn.push({ field : 'amountReal', title : "盘点", width : 60, align : 'center',
+            formatter : function(value, rowData, rowIndex) {
+                if(rowData.checked == 1){
+                    // 已盘点
+                    if(value != rowData.amount){
+                        // 不一致
+                        return "<span style='color: red;'>"+value+"</span>";
+                    }
+                    return value;
+                }
+                // 未盘点
+                return "<input type='text' data-amount='"+rowData.amount+"' id='amountReal"+rowIndex+"' value='"+rowData.amount
+                    +"' style='width: 50px; text-align: center;' class='amountReal'/>";
+            }
+        });
+
+        columnsOut[0] = columnsIn;
+
+        $('#mobile_product_list_grid_table_01').datagrid({
+            //width: 800,
+            height: ($(window).height()*0.8),
+            //title : '仓库管理',
+            //iconCls : 'icon-edit',
+            striped : true, //隔行变色
+            pagination : false, //分页控件
+            rownumbers : true, //显示行号
+            pageSize: 20, //每页显示条数
+            //collapsible : true, //是否可 折叠
+            //maximizable : true, // 最大化
+            singleSelect : true, //是否单选
+            idField : 'id', //主键行,不设置则无法取得选中的所有行
+            fitColumns : true, //自适应宽度
+            nowrap : false, //是否自动换行显示：true-不自动换行，false-自动换行
+
+            // clickToEdit: true,
+
+            checkOnSelect : true,
+            selectOnCheck : true,
+            // url : "/product/check/list/product.do?_t=" + Math.random(),
+            // frozenColumns : frozenColumnsOut,
+            columns : columnsOut,
+            toolbar: toolbars,
+            onLoadSuccess : function(data) {
+                // 重新加载数据，清空
+            }
+        })/*.datagrid('enableCellEditing').datagrid('gotoCell', {
+            index: 0,
+            field: 'amountReal'
+        })*/;
+    });
+    //]]>
+</script>
+
+</body>
+
+</html>

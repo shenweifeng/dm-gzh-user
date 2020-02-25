@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head th:replace="common/header :: common_header_mobile">
+    <meta charset="UTF-8"/>
+    <base target="_parent"/>
+
+    <style>
+
+        body {
+            font-family: '微软雅黑';
+            font-size: 14px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<header class="css-background-main">
+    <div class="m-toolbar">
+        <div class="m-title"> <span style="color: red; padding-right: 10px;"> 访问受限</span> </div>
+    </div>
+</header>
+
+<div style="padding: 20px; margin: 0 auto; text-align: center;">
+    <a href="javascript: void(0);" id="backto">点击返回</a>
+</div>
+
+<script th:inline="javascript">
+    //<![CDATA[
+    $(function() {
+        // js 代码逻辑
+
+        $("#backto").on('click', function(){
+            window.history.back(-1);
+        });
+    });
+    //]]>
+</script>
+
+</body>
+
+</html>

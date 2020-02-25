@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head th:replace="common/header :: common_header_mobile">
+    <meta charset="UTF-8"/>
+    <base target="_parent"/>
+
+    <style>
+
+        body {
+            font-family: '微软雅黑';
+            font-size: 14px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+<div class="easyui-navpanel">
+    <header class="css-background-main">
+        <div class="m-toolbar">
+            <div id="mobile-admin-index-title" class="m-title" style="text-align: left;">
+                <input class="easyui-textbox" style="width:90%;height:32px;" id="product-search">
+            </div>
+            <div class="m-right">
+                <a href="javascript:void(0)" class="easyui-menubutton" data-options="iconCls:'icon-more',menu:'#mm',menuAlign:'right',hasDownArrow:false"></a>
+            </div>
+        </div>
+    </header>
+
+    <div data-title="CHANEL" id="tab0">
+
+    </div>
+
+    <div id="mm" class="easyui-menu" style="width:150px;">
+<!--        <div data-options="iconCls:'icon-main-black'">首页</div>
+        <div class="menu-sep"></div>-->
+
+        <div th:each="m : ${permissionList}"
+             th:href="@{${m.url}}" data-options="iconCls:'icon-search'" th:text="${m.permissionName}">
+        </div>
+
+        <!--<shiro:hasPermission name="sys:product:list">sys:product:list</shiro:hasPermission>-->
+
+        <div class="menu-sep"></div>
+        <div th:href="@{/user/modifypass.html}" data-options="iconCls:'icon-man'">账户信息</div>
+        <div class="menu-sep"></div>
+        <div th:href="@{/logout}" data-options="iconCls:'icon-exit-black'">注销</div>
+    </div>
+
+</div>
+
+<script th:inline="javascript">
+    //<![CDATA[
+        $(function() {
+
+            $("#tab0").load("/sale/product.html");
+
+            $('#product-search').searchbox({
+                prompt: "产品搜索",
+                searcher:function(value){
+                    value = $.trim(value);
+                    $("#tab0").load("/sale/product.html?name="+value);
+                },
+                onChange: function(newValue,oldValue){
+                    newValue = $.trim(newValue);
+                    $("#tab0").load("/sale/product.html?name="+newValue);
+                }
+            });
+
+            $('#mm').menu({
+                onClick:function(item){
+                    // console.log(item);
+                    // layer.open({
+                    //     // title: ['标题', 'background-color: #eee;'], //第二个参数可以自定义标题的样式
+                    //     content: '点击了：'+item.text
+                    //     ,style: 'background-color:#09C1FF; color:#fff; border:none;' //自定风格
+                    // });
+                }
+            });
+        });
+    //]]>
+</script>
+
+</body>
+
+</html>

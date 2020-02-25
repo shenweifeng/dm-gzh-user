@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head th:replace="common/header :: common_header_mobile">
+    <meta charset="UTF-8"/>
+    <base target="_parent"/>
+
+    <style>
+
+        body {
+            font-family: '微软雅黑';
+            font-size: 14px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+<div class="easyui-navpanel">
+
+    <header class="css-background-main">
+        <div class="m-toolbar">
+            <div class="m-left">
+                <a th:href="@{${backurl}}" class="easyui-linkbutton" data-options="iconCls:'icon-back-black',plain:true"></a>
+            </div>
+            <div class="m-title">账户信息</div>
+         </div>
+    </header>
+
+    <form id="ff" style="padding: 10px;">
+
+        <div style="margin-bottom:10px;">
+            <input id="name" th:value="${obj.name}" class="easyui-textbox" data-options="editable: false" label="姓名:" prompt="姓名" style="width:100%">
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <input id="userName" th:value="${obj.userName}" class="easyui-textbox" data-options="editable: false" label="用户名:" prompt="用户名" style="width:100%">
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <input id="oldpass" class="easyui-passwordbox" label="原密码:" prompt="原密码" style="width:60%">
+        </div>
+        <div style="margin-bottom:10px;">
+            <input id="newpass" class="easyui-passwordbox" label="新密码:" prompt="新密码" style="width:60%">
+        </div>
+        <div style="margin-bottom:10px;">
+            <input id="newpass2" class="easyui-passwordbox" label="密码确认:" prompt="密码确认" style="width:60%">
+            <a id="mobile-store-save-btn-save" class="btn_menu_common" style="width: 80px;">确认修改</a>
+        </div>
+
+    </form>
+
+</div>
+
+<script th:inline="javascript">
+    //<![CDATA[
+    $(function() {
+        // js 代码逻辑
+
+        var obj = [[${obj}]];
+
+        $('#mobile-store-save-btn-save').linkbutton({
+            // iconCls: 'icon-save'
+        });
+
+        $('#mobile-store-save-btn-save').on('click', function() {
+
+            var oldpass = $("#oldpass").passwordbox("getValue");
+            var newpass = $("#newpass").passwordbox("getValue");
+            var newpass2 = $("#newpass2").passwordbox("getValue");
+
+            if(oldpass == ""){
+                tipsinfo("请输入原密码！");
+                return false;
+            }
+            if(newpass == "" || newpass2==""){
+                tipsinfo("请输入新密码！");
+                return false;
+            }
+            if(newpass != newpass2){
+                tipsinfo("两次输入的密码不一致！");
+                return false;
+            }
+            if(oldpass == newpass){
+                tipsinfo("新密码不能跟原密码一样！");
+                return false;
+            }
+
+            $.messager.confirm("系统提示","确定要修改密码？",function(r){
+                if(r){
+                    $.post(
+                        '/user/modifypass.do',
+                        {
+                            'userId': obj.userId,
+                            'oldpass': oldpass,
+                            'newpass': newpass
+                        },
+                        function(data){
+                            if(data.code=='200'){
+                                tipsinfo("操作成功！");
+                                window.location.replace('/admin/index?_t=' + Math.random());
+                            }else if(data.message){
+                                tipsinfo("操作失败："+data.message);
+                            }else{
+                                tipsinfo("网络不给力，请稍后再试！");
+                            }
+                        },
+                        'json' );
+                }
+            });
+
+        });
+    });
+    //]]>
+</script>
+
+</body>
+
+</html>

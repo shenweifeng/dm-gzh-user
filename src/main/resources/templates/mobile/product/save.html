@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head th:replace="common/header :: common_header_mobile">
+    <meta charset="UTF-8"/>
+    <base target="_parent"/>
+
+    <style>
+
+        body {
+            font-family: '微软雅黑';
+            font-size: 14px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+<div class="easyui-navpanel">
+
+    <header class="css-background-main">
+        <div class="m-toolbar">
+            <div class="m-left">
+                <a th:href="@{/product/list.html}" class="easyui-linkbutton" data-options="iconCls:'icon-back-black',plain:true"></a>
+            </div>
+            <div class="m-title">添加-产品信息</div>
+         </div>
+    </header>
+
+    <form id="ff" style="padding: 10px;">
+
+        <div style="margin-bottom:10px">
+            <input id="pid" class="easyui-textbox" label="产品类别:" prompt="产品类别" style="width:100%">
+            <input type="hidden" id="pid-value" value="0"/>
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <input id="name" class="easyui-textbox" label="产品名称:" prompt="产品名称" style="width:100%">
+        </div>
+
+<!--        <div style="margin-bottom:10px;">
+            <input id="model" class="easyui-textbox" label="产品型号:" prompt="多个型号,请用逗号分隔." style="width:100%">
+        </div>-->
+
+        <div style="margin-bottom:10px;">
+            <input id="state" class="easyui-textbox" label="产品状态:" prompt="产品状态" style="width:100%">
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <input id="offDate" class="easyui-datebox" required="required" label="下架日期:" prompt="下架日期" style="width:100%">
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <input id="price" class="easyui-numberbox" label="零售价:" prompt="零售价" style="width:100%">
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <input id="desc" class="easyui-textbox" label="产品描述:" prompt="产品描述" style="width:100%">
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <div style="float: left;">产品图片:</div>
+            <div style="margin-left: 100px;">
+                <input label="产品图片:" prompt="产品图片"
+                       class="weui-input teamFile02" type="file" accept="image/*"
+                       data-pid="saveFile_"
+                       id="saveFile_" name="file02"/>
+
+                <span id="show_saveFile_"></span><br/>
+                <span id="show_size_saveFile_"></span>
+
+                <!-- 文件上传统一配置 -->
+                <div id="div_saveFile_" style="padding-top: 5px;">
+                    <input type="hidden" id="file_saveFile_"/>
+                    <span data-pid="saveFile_" class="css_span_btn_red file_upload_btn">上传</span>
+                    <progress id="progress_saveFile_" value="0" style="width: 80px;"></progress>&nbsp;
+                    <span id="progress_percent_saveFile_">0%</span><br/>
+                    <span id="progress_size_up_saveFile_"></span>&nbsp;
+                </div>
+            </div>
+
+        </div>
+
+    </form>
+
+    <div style="margin: 0 auto; text-align: center;">
+        <a id="mobile-store-save-btn-save" class="btn_menu_common"
+           style="width: 90%;">保存</a>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    //<![CDATA[
+    $(function() {
+        // js 代码逻辑
+
+        $('#name').textbox().next('span').find('input').focus();
+
+        $('#offDate').datebox({
+            required: false,
+            editable: false
+        });
+
+        // 产品状态
+        var data_state = new Array();
+        data_state.push({"id": "1", "text": "待定"});
+        data_state.push({"id": "2", "text": "上架"});
+        data_state.push({"id": "3", "text": "下架"});
+        $('#state').combobox({
+            data: data_state,
+            required: true,  multiple: false, editable: false,
+            valueField:'id',
+            textField:'text',
+            onLoadSuccess: function(node, data){
+                $('#state').combobox('setValue', 1);
+            }
+        });
+
+        $('#price').numberbox({
+            min:0,
+            precision:2,
+            required: false
+        });
+
+        $('#pid').combotree({
+            url: "/product/category/tree.do",
+            multiple: false,
+            lines: true,
+            checkbox: true,
+            onlyLeafCheck: true,//当为多选时，起作用，只允许选择叶子节点
+            onSelect: function (node) {//当为单选时，只允许选择叶子节点的设置
+                $("#pid-value").val(node.id);
+            }
+
+        });
+
+        $('#mobile-store-save-btn-save').linkbutton({
+            iconCls: 'icon-save'
+        });
+
+        $('#mobile-store-save-btn-save').on('click', function() {
+            $("#name").val($.trim($("#name").val()));
+            $("#desc").val($.trim($("#desc").val()));
+            // $("#model").val($.trim($("#model").val()));
+
+            if($("#pid-value").val()=="" || $("#pid-value").val()=="0"){
+                tipsinfo("请选择产品类别！");
+                return false;
+            }
+
+            if($("#name").val() == ""){
+                tipsinfo("请输入名称！");
+                return false;
+            }
+            if($("#desc").val() == ""){
+                tipsinfo("请输入描述！");
+                return false;
+            }
+            // if($("#model").val() == ""){
+            //     tipsinfo("请输入型号！");
+            //     return false;
+            // }
+            var offDate = $('#offDate').datebox('getValue');
+            // if(offDate == ""){
+            //     tipsinfo("请输入下架日期！");
+            //     return false;
+            // }
+            var price = $('#price').numberbox('getValue');
+            // if(price == ""){
+            //     tipsinfo("请输入零售价！");
+            //     return false;
+            // }
+            // 产品图片
+            var img1 = $("#file_saveFile_").val();
+            if(img1 == ""){
+                tipsinfo("请上传产品图片！");
+                return false;
+            }
+
+            $.messager.confirm("系统提示","确定要保存？",function(r){
+                if(r){
+                    $.post(
+                        '/product/save.do',
+                        {
+                            'categoryId': $("#pid-value").val(),
+                            'name': $("#name").val(),
+                            // 'model': $("#model").val(),
+                            'state': $('#state').combobox('getValue'),
+                            'offDateQuery': offDate,
+                            'price': price,
+                            'desc': $("#desc").val(),
+                            'img1': img1
+                        },
+                        function(data){
+                            if(data.code=='200'){
+                                tipsinfo("操作成功！");
+                            }else if(data.message){
+                                tipsinfo("操作失败："+data.message);
+                            }else{
+                                tipsinfo("网络不给力，请稍后再试！");
+                            }
+                        },
+                        'json' );
+                }
+            });
+        }); // end of save
+
+
+        // 点击文件上传按钮
+        $(".file_upload_btn").on("click", function(){
+            var pid = $(this).data("pid");
+            if( $("#"+pid).val() == ''){
+                alert("请选择图片！");
+                return false;
+            }
+            if($("#file_"+pid).val()!=''){
+                alert("图片已上传，勿重复上传！");
+                return false;
+            }
+            console.log(pid);
+            var file = document.getElementById(pid).files[0];
+            if (file) {
+                var size = file.size;
+                $("#progress_size_up_"+pid).html("0/" + size);
+
+                //创建FormData对象，初始化为form表单中的数据。需要添加其他数据可使用formData.append("property", "value");
+                var formData = new FormData();
+                formData.append("file", document.getElementById(pid).files[0]);
+                //ajax异步上传
+                $.ajax({
+                    url: "http://common.dianmic.com/p01/up/upload.do",
+                    type: "POST",
+                    data: formData,
+                    xhr: function(){ //获取ajaxSettings中的xhr对象，为它的upload属性绑定progress事件的处理函数
+                        myXhr = $.ajaxSettings.xhr();
+                        if(myXhr.upload){ //检查upload属性是否存在
+                            //绑定progress事件的回调函数
+                            myXhr.upload.addEventListener('progress', function(e) {
+                                if (e.lengthComputable) {
+                                    $('#progress_'+pid).attr({value : e.loaded, max : e.total}); //更新数据到进度条
+                                    var percent = e.loaded/e.total*100;
+                                    percent = percent.toFixed(0);
+                                    if(percent==100){
+                                        percent = 99;
+                                    }
+                                    $('#progress_percent_'+pid).html(percent + "%");
+                                    $("#progress_size_up_"+pid).html(e.loaded + "/" + e.total + "&nbsp;<font color='blue'>上传中...</font>");
+                                }
+                            }  , false);
+                        }
+                        return myXhr; //xhr对象返回给jQuery使用
+                    },
+                    dataType: "json",
+                    success: function(data){
+                        if(data.a==200){
+                            // 上传成功
+                            $("#progress_size_up_"+pid).html("<font color='red'>上传成功！</font>");
+                            $("#file_"+pid).val(data.d.d1);
+                            $('#progress_percent_'+pid).html("100%");
+                        }else {
+                            // 上传失败
+                            $("#progress_size_up_"+pid).html("上传失败！");
+                        }
+                    },
+                    contentType: false, //必须false才会自动加上正确的Content-Type
+                    processData: false  //必须false才会避开jQuery对 formdata 的默认处理
+                });
+            }
+        });
+
+        // 选择上传文件操作，显示图片信息
+        selectFileToShow = function(pid){
+
+            $("#file_"+pid).val("");
+            $("#progress_size_up_"+pid).html("");
+            $('#progress_percent_'+pid).html("0%");
+            $("#show_size_"+pid).html("");
+            $("#show_"+pid).html('');
+            $('#progress_'+pid).attr({value : 0});
+
+            console.log("pid="+pid);
+            var fileName = $("#"+pid).val();
+            console.log("fileName="+fileName);
+            var file_typename = fileName.substring(fileName.lastIndexOf('.'), fileName.length);
+            if (file_typename == '.jpg' || file_typename == '.jpeg' || file_typename == '.png') {
+                //这里限定上传文件文件类型
+                if(typeof FileReader == "undified") {
+                    return;
+                }
+                var resultFile = document.getElementById(pid).files[0];
+                if (resultFile) {
+                    var reader = new FileReader();
+                    reader.readAsDataURL(resultFile);
+                    reader.onload = function (e) {
+                        var urlData = this.result;
+                        $("#show_"+pid).html('<br/><img src="'+urlData+'" width="100px" />');
+
+                        var size = 0;
+                        if (resultFile.size > 1024 * 1024){
+                            size = (Math.round(resultFile.size * 100 / (1024 * 1024)) / 100).toString() + 'MB';
+                        } else{
+                            size = (Math.round(resultFile.size * 100 / 1024) / 100).toString() + 'KB';
+                        }
+                        $("#show_size_"+pid).html("文件大小：" + size+"<br/>");
+                    };
+                }
+            } else {
+                alert("对不起，文件格式不符.,请重新选择要上传的文件(.jpg,.jpeg,.png格式）)");
+                $("#"+pid).val('');
+                return;
+            }
+        } // end of function selectFileToShow()
+
+        $(".teamFile02").on("change",function(){
+            selectFileToShow($(this).data("pid"));
+        });
+
+
+    });
+    //]]>
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head th:replace="common/header :: common_header_mobile">
+    <meta charset="UTF-8"/>
+    <base target="_parent"/>
+
+    <style>
+
+        body {
+            font-family: '微软雅黑';
+            font-size: 14px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+<div class="easyui-navpanel">
+    <header class="css-background-main">
+        <div class="m-toolbar">
+            <div id="mobile-admin-index-title" class="m-title">香奈儿进销存管理系统</div>
+            <div class="m-right">
+                <a th:href="@{/logout}" class="easyui-linkbutton" data-options="iconCls:'icon-exit-black',plain:true"></a>
+            </div>
+        </div>
+    </header>
+
+    <div data-title="香奈儿进销存管理系统" id="tab0" data-url="/admin/index/main">
+    </div>
+
+</div>
+
+<script th:inline="javascript">
+    //<![CDATA[
+        $(function() {
+            $("#tab0").load("/admin/index/main");
+        });
+    //]]>
+</script>
+
+</body>
+
+</html>

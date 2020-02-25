@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head th:replace="common/header :: common_header_mobile">
+    <meta charset="UTF-8"/>
+    <base target="_parent"/>
+
+    <style>
+
+        body {
+            font-family: '微软雅黑';
+            font-size: 14px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+<div class="easyui-navpanel">
+
+    <header class="css-background-main">
+        <div class="m-toolbar">
+            <div class="m-left">
+                <a th:href="@{/admin/index}" class="easyui-linkbutton" data-options="iconCls:'icon-back-black',plain:true"></a>
+            </div>
+            <div class="m-title">人员管理</div>
+        </div>
+    </header>
+
+    <div style="padding-top: 10px">
+        <table id="mobile_admin_user_list_grid_table_01"></table>
+    </div>
+
+</div>
+
+<script th:inline="javascript">
+    $(function() {
+        // js 代码逻辑
+
+        var toolbars = [];
+        toolbars.push('-');
+        toolbars.push({
+            text : '新增',
+            iconCls : 'icon-add',
+            handler : function() {
+                window.location.replace('/admin/user/save.html?_t=' + Math.random());
+            }
+        });
+        toolbars.push('-');
+
+        toolbars.push({
+            text : '修改',
+            iconCls : 'icon-edit',
+            handler : function() {
+                var rows = $('#mobile_admin_user_list_grid_table_01').datagrid('getChecked');
+                var selectSize = rows.length;
+                if (selectSize == 0) {
+                    tipsinfo("请选择数据!");
+                    return false;
+                }
+                if (selectSize > 1) {
+                    tipsinfo("一次只能操作一条数据!");
+                    return false;
+                }
+                window.location.replace('/admin/user/update.html?userId='+rows[0].userId+'&_t=' + Math.random());
+            }
+        });
+        toolbars.push('-');
+
+        // 冻结列
+        var frozenColumnsOut = [];
+        var frozenColumnsIn = [];
+        frozenColumnsIn.push({ field : 'ck', checkbox : true });
+        frozenColumnsOut[0] = frozenColumnsIn;
+
+        // 自由列
+        var columnsOut = [];
+        var columnsIn = [];
+
+        columnsIn.push({ field : 'userId', title : "店员ID", hidden: true, width: 60, align : 'center' });
+        columnsIn.push({ field : 'name', title : "姓名", width : 60, align : 'center' });
+        columnsIn.push({ field : 'userName', title : "登录名", width : 60, align : 'center' });
+        columnsIn.push({ field : 'queryRoles', title : "角色", width : 60, align : 'center' });
+        columnsOut[0] = columnsIn;
+
+        $('#mobile_admin_user_list_grid_table_01').datagrid({
+            height: ($(window).height()*0.8),
+            striped : true, //隔行变色
+            pagination : false, //分页控件
+            rownumbers : true, //显示行号
+            pageSize: 20, //每页显示条数
+            singleSelect : true, //是否单选
+            idField : 'storeId', //主键行,不设置则无法取得选中的所有行
+            fitColumns : true, //自适应宽度
+            nowrap : false, //是否自动换行显示：true-不自动换行，false-自动换行
+
+            checkOnSelect : true,
+            selectOnCheck : true,
+            url : "/admin/user/list.do?_t=" + Math.random(),
+            frozenColumns : frozenColumnsOut,
+            columns : columnsOut,
+            toolbar: toolbars,
+            onLoadSuccess : function(data) {
+            }
+        });
+
+    });
+</script>
+
+</body>
+
+</html>

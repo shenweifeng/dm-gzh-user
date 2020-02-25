@@ -1,0 +1,83 @@
+server:
+  port: 8080
+  #servlet:
+  #  context-path: /user
+
+#management:
+#  endpoint:
+#    shutdown:
+#      enabled: true
+#  server:
+#    address: 127.0.0.1
+#    port: 7778
+
+spring:
+  mail:
+    host: smtp.dianmic.com
+    username: service@dianmic.com
+    password: Abc123456
+    default-encoding: UTF-8
+
+  thymeleaf:
+    cache: false
+
+  cache:
+    time-to-live : 3600 #缓存过期时间
+    cache-enable : false  #是否启用缓存
+    redis-shiro: false  #是否启用redis缓存shiro， cache-enable为true的时候起作用
+  #     如果开启缓存@EnableCaching 默认的缓存是springboot的SimpleCache
+  #     如果引入redis等缓存后，就会用引入的缓存框架，如果不想用可以强制type:simple
+  #    type: simple
+
+  application:
+    name: user
+
+  datasource:
+    name: dmGzhUser
+
+    url: jdbc:mysql://localhost:3306/dm-gzh?useUnicode=yes&amp&characterEncoding=UTF8&amp&autoReconnect=true&amp&rewriteBatchedStatements=TRUE&amp&useSSL=false&amp&zeroDateTimeBehavior=convertToNull&amp&serverTimezone=Asia/Shanghai
+    username: root
+    password: swf
+    
+    # 使用druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+
+  redis:
+    database: 2
+    
+    # server config
+    #host: 121.42.237.207
+    
+    # local config
+    host: 127.0.0.1
+    
+    password: dianmic
+    port: 6379
+
+    timeout: 10000
+    lettuce:
+        pool:
+          max-idle: 10
+          max-active: 10
+          min-idle: 5
+          max-wait: 10000
+
+  #  jedis.pool.max-idle: 7
+  #  jedis.pool.min-idle: 0
+  #  jedis.pool.max-active: 8
+  #  jedis.pool.max-wait: -1
+
+
+mybatis:
+  mapper-locations: classpath:mapping/*.xml
+  #type-aliases-package: com.dianmic.dmbxg.task.domain
+  #config-location: classpath:mybatis-config.xml
+
+#pagehelper分页插件
+pagehelper:
+    helperDialect: mysql
+    reasonable: true
+    supportMethodsArguments: true
+    params: count=countSql
+

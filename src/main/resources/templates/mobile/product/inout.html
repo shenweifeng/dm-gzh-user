@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head th:replace="common/header :: common_header_mobile">
+    <meta charset="UTF-8"/>
+    <base target="_parent"/>
+
+    <style>
+
+        body {
+            font-family: '微软雅黑';
+            font-size: 14px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+<div class="easyui-navpanel">
+
+    <header class="css-background-main">
+        <div class="m-toolbar">
+            <div class="m-left">
+                <a th:href="@{/product/list.html}" class="easyui-linkbutton" data-options="iconCls:'icon-back-black',plain:true"></a>
+            </div>
+            <div class="m-title" th:text="${obj.name} + '-出入库'"></div>
+         </div>
+    </header>
+
+    <form id="ff" style="padding: 10px;">
+
+        <div style="margin-bottom:10px">
+            <input id="pid" th:value="${obj.pidName}" class="easyui-textbox " data-options="editable: false" label="产品类别:" prompt="产品类别" style="width:60%">
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <input id="name" th:value="${obj.name}" class="easyui-textbox" data-options="editable: false" label="产品名称:" prompt="产品名称" style="width:60%">
+        </div>
+
+        <div style="margin-bottom:10px">
+            <input id="storeId" class="easyui-textbox" label="所属仓库:" prompt="" style="width:60%">
+        </div>
+
+        <div style="margin-bottom:10px">
+            <input id="model" class="easyui-textbox" label="产品型号:" prompt="" style="width:60%">
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <input id="inout" class="easyui-textbox" label="出入库:" prompt="" style="width:60%">
+            <span id="remain" style="color: red;"></span>
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <input id="count" class="easyui-numberbox" label="数量:" prompt="数量" style="width:60%">
+            <a id="mobile-product-inout-btn-save" class="btn_menu_common" style="width: 80px;">保存</a>
+        </div>
+
+    </form>
+
+</div>
+
+<script th:inline="javascript">
+    //<![CDATA[
+    $(function() {
+        // js 代码逻辑
+
+        var obj = [[${obj}]];
+
+        // 出入库
+        var data_inout = new Array();
+        data_inout.push({"id": "1", "text": "入库"});
+        data_inout.push({"id": "2", "text": "出库"});
+        $('#inout').combobox({
+            data: data_inout,
+            // required: true,
+            multiple: false, editable: false,
+            valueField:'id',
+            textField:'text',
+            onChange: function(newValue,oldValue){
+                $("#remain").html("");
+               if(newValue==2){
+                   // 出库：检索剩余库存
+
+                   var storeId = $('#storeId').combobox('getValue');
+                   if(storeId == ""){
+                       return false;
+                   }
+                   var model = $('#model').combobox('getValue');
+                   if(model == ""){
+                       return false;
+                   }
+                   console.log("productId="+obj.id+", storeId="+storeId+", model="+model);
+                   $.post( '/product/ware/remain.do',
+                       {
+                           'productId': obj.id,
+                           'storeId': storeId,
+                           'model': model
+                       },
+                       function(data){
+                           if(data.code=='200'){
+                               $("#remain").html("库存："+data.data);
+                           }
+                       }, 'json' );
+               }
+            }
+        });
+
+        // 仓库
+        $('#storeId').combobox({
+            url: '/store/tree.do',
+            // required: true,
+            multiple: false, editable: false,
+            valueField:'id',
+            textField:'text',
+            onLoadSuccess: function(data){
+                // if(data != undefined && data.length>0){
+                //     $('#inout').combobox('setValue', data[0].id);
+                // }
+            }
+        });
+
+        // 产品型号
+        $('#model').combobox({
+            url: '/product/tree/model.do?productId='+obj.id,
+            // required: true,
+            multiple: false, editable: true,
+            valueField:'id',
+            textField:'text',
+            onLoadSuccess: function(data){
+                // if(data != undefined && data.length>0){
+                //     $('#inout').combobox('setValue', data[0].id);
+                // }
+            }
+        });
+
+        $('#count').numberbox({ min:0, precision:0, required:true });
+
+        $('#mobile-product-inout-btn-save').linkbutton({
+            iconCls: 'icon-save'
+        });
+
+        $('#mobile-product-inout-btn-save').on('click', function() {
+
+            var inout = $('#inout').combobox('getValue');
+
+            var storeId = $('#storeId').combobox('getValue');
+            if(storeId == ""){
+                tipsinfo("请选择仓库！");
+                return false;
+            }
+            var model = $('#model').combobox('getValue');
+            if(model == ""){
+                tipsinfo("请选择产品型号！");
+                return false;
+            }
+
+            var amount = $('#count').numberbox('getValue');
+            if(amount == ""){
+                tipsinfo("请输入数量！");
+                return false;
+            }
+
+            $.messager.confirm("系统提示","确定要保存？",function(r){
+                if(r){
+                    $.post(
+                        '/product/inout.do',
+                        {
+                            'productId': obj.id,
+                            'type': inout,
+                            'storeId': storeId,
+                            'model': model,
+                            'amount': amount
+                        },
+                        function(data){
+                            if(data.code=='200'){
+                                tipsinfo("操作成功！");
+                            }else if(data.message){
+                                tipsinfo("操作失败："+data.message);
+                            }else{
+                                tipsinfo("网络不给力，请稍后再试！");
+                            }
+                        },
+                        'json' );
+                }
+            });
+        }); // end of save
+
+    });
+    //]]>
+</script>
+
+</body>
+
+</html>

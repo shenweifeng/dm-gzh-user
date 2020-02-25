@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head th:replace="common/header :: common_header_mobile">
+    <meta charset="UTF-8"/>
+    <base target="_parent"/>
+
+    <style>
+
+        body {
+            font-family: '微软雅黑';
+            font-size: 14px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+<div class="easyui-navpanel">
+
+    <header class="css-background-main">
+        <div class="m-toolbar">
+            <div class="m-left">
+                <a th:href="@{/product/list.html}" class="easyui-linkbutton" data-options="iconCls:'icon-back-black',plain:true"></a>
+            </div>
+            <div class="m-title" th:text="${obj.name}">产品信息</div>
+         </div>
+    </header>
+
+    <form id="ff" style="padding: 10px;">
+
+        <div style="margin-bottom:10px">
+            <input id="pid" th:value="${obj.pidName}" class="easyui-textbox" data-options="editable: false" label="产品类别:" prompt="产品类别" style="width:100%">
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <input id="name" th:value="${obj.name}" class="easyui-textbox" data-options="editable: false" label="产品名称:" prompt="产品名称" style="width:100%">
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <input id="ware" th:value="${obj.ware}" class="easyui-textbox" data-options="editable: false" label="剩余库存:" prompt="剩余库存" style="width:100%">
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <input id="state" th:value="${obj.stateName}" class="easyui-textbox" data-options="editable: false" label="产品状态:" prompt="产品状态" style="width:100%">
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <input id="offDate" th:value="${obj.offDateName}" class="easyui-textbox" data-options="editable: false" label="下架日期:" prompt="下架日期" style="width:100%">
+        </div>
+
+        <div style="margin-bottom:10px;">
+         <input id="price" th:value="${obj.price}" class="easyui-numberbox" data-options="editable: false" label="零售价:" prompt="零售价" style="width:100%">
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <input id="desc" th:value="${obj.desc}" class="easyui-textbox" data-options="editable: false" label="产品描述:" prompt="产品描述" style="width:100%">
+        </div>
+
+        <div id="mobile-product-view-div-models" style="margin-bottom:10px;">
+        </div>
+
+    </form>
+
+    <div style="margin-top:10px;">
+        <img th:src="${obj.img1Url}" width="100%;" title="产品图"/>
+    </div>
+
+</div>
+
+<script th:inline="javascript">
+    //<![CDATA[
+    $(function() {
+        // js 代码逻辑
+
+        var obj = [[${obj}]];
+        $("#mobile-product-view-div-models").load("/product/model/list.html?productId="+obj.id);
+    });
+    //]]>
+</script>
+
+</body>
+
+</html>

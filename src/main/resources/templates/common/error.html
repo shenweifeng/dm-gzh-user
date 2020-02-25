@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head>
+	<meta charset="UTF-8"/>
+	<base target="_parent"/>
+
+<title>点微ERP</title>
+	
+<meta http-equiv="pragma" content="no-cache" />
+<meta http-equiv="cache-control" content="no-cache"/>
+<meta http-equiv="expires" content="0"/>
+<meta http-equiv="keywords" content="点微信息,点微ERP"/>
+<meta http-equiv="description" content="点微信息,点微ERP"/>
+<meta http-equiv="Content-Type"  content="text/html; Charset=utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0"/>
+
+	<script th:src="@{/js/jquery-2.1.1.min.js}"></script>
+
+<style>
+*{
+	margin:0;
+	padding:0;
+}
+#order_main{
+	width:750px;
+	margin:0 auto;
+	font-size:14px;
+	font-family:'宋体';
+}
+
+#order_main ul{
+	list-style: none;
+}
+#order_main ul li{
+	padding-top: 20px;
+}
+.pay_yes{
+	color: white;
+    font-family: 幼圆;
+    font-size: 12px;
+    background-color: #00B0F0;
+    border-radius: 10px;
+    width: 60px;
+    height: 25px;
+    cursor: hand;
+}
+.pay_no{
+	color: white;
+    font-family: 幼圆;
+    font-size: 12px;
+    background-color: #c0c0c0;
+    border-radius: 10px;
+    width: 60px;
+    height: 25px;
+    cursor: hand;
+}
+</style>
+
+<script type="text/javascript">
+<!--
+$(function() {
+});
+//-->
+</script>
+
+</head>
+<body>
+
+	<div id="order_main" style="text-align: center; padding-top: 50px;">
+	
+		<table cellspacing="10">
+			
+			<thead>
+				<tr>
+					<th><span style="color: red;">登录失败：${error }，请联系客服！</span></th>
+				</tr>
+			</thead>
+			
+		</table>
+	
+	</div>
+	
+</body>
+</html>
